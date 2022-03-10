@@ -1,0 +1,102 @@
+# Logistic Model Code for Credit Data Project 
+# for Dat-690 Capstone in Data Analytics
+# Updated: 1-31-2021
+
+# This is the final version of the code used to run the the logistic regression
+# model. For future data to be used to need to specify the path the source of the 
+# data and then run the code
+
+
+# set libraries that will be used in this program
+# readr to read the data and ROCR to create a ROC and AUC models and plots
+
+library(readr)
+library(ROCR)
+
+
+# Training data 
+
+# load and view the data set that will be used for the training model
+
+Credit_Data_Training <- read_csv("SNHU/DAT-650/Credit Data.csv")
+View(Credit_Data_Training)
+
+# check for missing data using sapply function, there were no missing variables
+# in the training and verification data sets
+
+sapply(Credit_Data_Training,function(x) sum(is.na(x)))
+
+
+# use the glm function to create a logistic regression model of our data
+
+logitMod1 <- glm(DEFAULT ~ CHK_ACCT + HISTORY + SAV_ACCT + GUARANTOR + EMPLOYMENT, 
+                data=Credit_Data_Training, family=binomial(link="logit"))
+summary(logitMod1)
+
+# creating a ROC curve chart and computing the AUC of the model
+
+pred1 <- prediction(predict(logitMod1), Credit_Data_Training$DEFAULT)
+perf1 <- performance(pred1,"tpr","fpr")
+plot(perf1)
+
+auc1 <- performance(pred1, measure = "auc")
+auc1 <- auc1@y.values[[1]]
+
+
+
+# Verification data 
+
+# the data for the verification data set
+
+Credit_Data_Verification <- read_csv("SNHU/DAT-690/CreditData_Verify.csv")
+View(Credit_Data_Verification)
+
+# check for missing data using sapply function, there were no missing variables
+# in the training and verification data sets
+
+sapply(Credit_Data_Verification,function(x) sum(is.na(x)))
+
+# use the glm function to create a logistic regression model of our data
+
+logitMod2 <- glm(DEFAULT ~ CHK_ACCT + HISTORY + SAV_ACCT + GUARANTOR + EMPLOYMENT, 
+                data=Credit_Data_Verification, family=binomial(link="logit"))
+summary(logitMod2)
+
+# creating a ROC curve chart and computing the AUC of the model
+
+pred2 <- prediction(predict(logitMod2), Credit_Data_Verification$DEFAULT)
+perf2 <- performance(pred1,"tpr","fpr")
+plot(perf2)
+
+auc2 <- performance(pred2, measure = "auc")
+auc2 <- auc2@y.values[[1]]
+
+
+
+# Production Data
+
+# for future data remove the comment from below to read in new data and create 
+# the logisitic regression model
+
+# Credit_Data_Production <- read_csv("insert path to data here")
+# View(Credit_Data_Production)
+
+# check for missing data using sapply function, there were no missing variables
+# in the training and verification data sets
+
+# sapply(Credit_Data_Production,function(x) sum(is.na(x)))
+
+# use the glm function to create a logistic regression model of our data
+
+# logitModP <- glm(DEFAULT ~ CHK_ACCT + HISTORY + SAV_ACCT + GUARANTOR + EMPLOYMENT, 
+#                 data=Credit_Data_Production, family=binomial(link="logit"))
+# summary(logitModP)
+
+# creating a ROC curve chart and computing the AUC of the model to validate the model
+
+# pred3 <- prediction(predict(logitModP), Credit_Data_Production$DEFAULT)
+# perf3 <- performance(pred3,"tpr","fpr")
+# plot(perf3)
+# 
+# auc3 <- performance(pred3, measure = "auc")
+# auc3 <- auc3@y.values[[1]]
